@@ -1,0 +1,435 @@
+<?xml version="1.1" encoding="UTF-8" ?>
+
+<Form version="1.5" maxVersion="1.7" type="org.netbeans.modules.form.forminfo.JDialogFormInfo">
+  <Properties>
+    <Property name="defaultCloseOperation" type="int" value="2"/>
+    <Property name="title" type="java.lang.String" resourceKey="Form.title"/>
+    <Property name="iconImages" type="java.util.List" editor="org.netbeans.modules.form.ComponentChooserEditor">
+      <ComponentRef name="null"/>
+    </Property>
+    <Property name="modalityType" type="java.awt.Dialog$ModalityType" editor="org.netbeans.modules.form.editors.EnumEditor">
+      <Value id="APPLICATION_MODAL"/>
+    </Property>
+    <Property name="name" type="java.lang.String" value="Form" noResource="true"/>
+    <Property name="resizable" type="boolean" value="false"/>
+  </Properties>
+  <SyntheticProperties>
+    <SyntheticProperty name="formSizePolicy" type="int" value="1"/>
+  </SyntheticProperties>
+  <AuxValues>
+    <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="2"/>
+    <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateFQN" type="java.lang.Boolean" value="true"/>
+    <AuxValue name="FormSettings_generateMnemonicsCode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_i18nAutoMode" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_layoutCodeTarget" type="java.lang.Integer" value="1"/>
+    <AuxValue name="FormSettings_listenerGenerationStyle" type="java.lang.Integer" value="0"/>
+    <AuxValue name="FormSettings_variablesLocal" type="java.lang.Boolean" value="false"/>
+    <AuxValue name="FormSettings_variablesModifier" type="java.lang.Integer" value="2"/>
+  </AuxValues>
+
+  <Layout>
+    <DimensionLayout dim="0">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lvlWorkPath" alignment="0" min="-2" pref="131" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Group type="103" groupAlignment="0" attributes="0">
+                              <Group type="102" attributes="0">
+                                  <Component id="lvlConfigPath" pref="187" max="32767" attributes="0"/>
+                                  <EmptySpace pref="49" max="32767" attributes="0"/>
+                              </Group>
+                              <Group type="102" alignment="0" attributes="0">
+                                  <Component id="lvlInter1" min="-2" max="-2" attributes="0"/>
+                                  <EmptySpace max="-2" attributes="0"/>
+                              </Group>
+                          </Group>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="lvlROI" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="60" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Group type="102" alignment="1" attributes="0">
+                              <Group type="103" groupAlignment="1" max="-2" attributes="0">
+                                  <Component id="txtWorkPath" max="32767" attributes="1"/>
+                                  <Component id="txtConfigPath" alignment="1" pref="285" max="32767" attributes="1"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Component id="butWorkPath" min="-2" pref="97" max="-2" attributes="0"/>
+                                  <Component id="butConfigPath" min="-2" pref="97" max="-2" attributes="0"/>
+                              </Group>
+                              <EmptySpace max="-2" attributes="0"/>
+                          </Group>
+                          <Group type="102" attributes="1">
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
+                                      <Component id="txtNumPixIntDefX" min="-2" pref="51" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lvlInter2" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="lvlROI1" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="txtROI_X1" linkSize="2" min="-2" pref="42" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="lvlROI2" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace min="-2" pref="1" max="-2" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <EmptySpace min="-2" pref="11" max="-2" attributes="0"/>
+                                      <Component id="txtROI_X2" linkSize="2" min="-2" pref="42" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lvlROI3" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace max="-2" attributes="0"/>
+                                      <Component id="txtROI_Y1" linkSize="2" min="-2" pref="42" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lvlROI4" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="10" pref="10" max="-2" attributes="0"/>
+                                      <Component id="txtROI_Y2" linkSize="2" min="-2" pref="42" max="-2" attributes="0"/>
+                                  </Group>
+                                  <Group type="102" alignment="0" attributes="0">
+                                      <Component id="txtNumPixIntDefY" min="-2" pref="51" max="-2" attributes="0"/>
+                                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                                      <Component id="lvlInter3" min="-2" max="-2" attributes="0"/>
+                                  </Group>
+                              </Group>
+                              <EmptySpace max="32767" attributes="0"/>
+                          </Group>
+                      </Group>
+                  </Group>
+                  <Group type="102" alignment="0" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkWillRenameFiles" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkToIsocenter" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="122" max="32767" attributes="0"/>
+                      <Component id="butAccept" min="-2" pref="104" max="-2" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="butCancel" min="-2" pref="106" max="-2" attributes="0"/>
+                      <EmptySpace min="-2" pref="17" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chkGenerateASCII" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkGenerateTIFF" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="chkActivateInterpolation" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace pref="365" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+          </Group>
+      </Group>
+    </DimensionLayout>
+    <DimensionLayout dim="1">
+      <Group type="103" groupAlignment="0" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lvlWorkPath" alignment="3" min="-2" max="-2" attributes="1"/>
+                  <Component id="txtWorkPath" alignment="3" min="-2" pref="21" max="-2" attributes="1"/>
+                  <Component id="butWorkPath" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lvlConfigPath" alignment="3" min="-2" max="-2" attributes="1"/>
+                  <Component id="txtConfigPath" alignment="3" min="-2" pref="21" max="-2" attributes="1"/>
+                  <Component id="butConfigPath" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="txtNumPixIntDefX" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="lvlInter2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtNumPixIntDefY" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="lvlInter3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lvlInter1" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lvlROI" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lvlROI1" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtROI_X1" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="txtROI_X2" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="lvlROI2" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="lvlROI3" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtROI_Y1" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+                  <Component id="lvlROI4" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txtROI_Y2" alignment="3" min="-2" pref="20" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace min="-2" pref="21" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="1" attributes="0">
+                  <Group type="102" attributes="0">
+                      <Component id="chkActivateInterpolation" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkGenerateTIFF" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkGenerateASCII" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkToIsocenter" min="-2" max="-2" attributes="0"/>
+                      <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                      <Component id="chkWillRenameFiles" min="-2" max="-2" attributes="0"/>
+                  </Group>
+                  <Group type="103" groupAlignment="3" attributes="0">
+                      <Component id="butAccept" alignment="3" min="-2" pref="29" max="-2" attributes="0"/>
+                      <Component id="butCancel" alignment="3" min="-2" pref="28" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="32767" attributes="0"/>
+          </Group>
+      </Group>
+    </DimensionLayout>
+  </Layout>
+  <SubComponents>
+    <Component class="javax.swing.JTextField" name="txtWorkPath">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="font" type="java.awt.Font" resourceKey="txtWorkPath.font"/>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtWorkPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlWorkPath">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="butAccept.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlWorkPath.text"/>
+        <Property name="name" type="java.lang.String" value="lvlWorkPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="butAccept">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="butAccept.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="butAccept.text"/>
+        <Property name="name" type="java.lang.String" value="butAccept" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="butAcceptActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="butCancel">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="butAccept.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="butCancel.text"/>
+        <Property name="name" type="java.lang.String" value="butCancel" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="butCancelActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JButton" name="butWorkPath">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="butAccept.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="butWorkPath.text"/>
+        <Property name="name" type="java.lang.String" value="butWorkPath" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="butWorkPathActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlConfigPath">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlConfigPath.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlConfigPath.text"/>
+        <Property name="name" type="java.lang.String" value="lvlConfigPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtConfigPath">
+      <Properties>
+        <Property name="editable" type="boolean" value="false"/>
+        <Property name="font" type="java.awt.Font" resourceKey="txtConfigPath.font"/>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtConfigPath" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="butConfigPath">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="butConfigPath.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="butConfigPath.text"/>
+        <Property name="name" type="java.lang.String" value="butConfigPath" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="butConfigPathActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlInter1">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlInter1.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlInter1.text"/>
+        <Property name="name" type="java.lang.String" value="lvlInter1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNumPixIntDefX">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="txtNumPixIntDefX.font"/>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="text" type="java.lang.String" resourceKey="txtNumPixIntDefX.text"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtNumPixIntDefX" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlInter2">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlInter2.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlInter2.text"/>
+        <Property name="name" type="java.lang.String" value="lvlInter2" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtNumPixIntDefY">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="txtNumPixIntDefY.font"/>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="text" type="java.lang.String" resourceKey="txtNumPixIntDefY.text"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtNumPixIntDefY" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlInter3">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlInter3.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlInter3.text"/>
+        <Property name="name" type="java.lang.String" value="lvlInter3" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkGenerateASCII">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="chkGenerateASCII.font"/>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkGenerateASCII.text"/>
+        <Property name="name" type="java.lang.String" value="chkGenerateASCII" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkGenerateTIFF">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="chkGenerateTIFF.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkGenerateTIFF.text"/>
+        <Property name="name" type="java.lang.String" value="chkGenerateTIFF" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkActivateInterpolation">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="chkActivateInterpolation.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkActivateInterpolation.text"/>
+        <Property name="name" type="java.lang.String" value="chkActivateInterpolation" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkToIsocenter">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="chkToIsocenter.font"/>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkToIsocenter.text"/>
+        <Property name="name" type="java.lang.String" value="chkToIsocenter" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chkWillRenameFiles">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="chkWillRenameFiles.font"/>
+        <Property name="selected" type="boolean" value="true"/>
+        <Property name="text" type="java.lang.String" resourceKey="chkWillRenameFiles.text"/>
+        <Property name="name" type="java.lang.String" value="chkWillRenameFiles" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlROI">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlROI.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlROI.text"/>
+        <Property name="name" type="java.lang.String" value="lvlROI" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlROI1">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlROI1.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlROI1.text"/>
+        <Property name="name" type="java.lang.String" value="lvlROI1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlROI2">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlROI2.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlROI2.text"/>
+        <Property name="name" type="java.lang.String" value="lvlROI2" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlROI3">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlROI3.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlROI3.text"/>
+        <Property name="name" type="java.lang.String" value="lvlROI3" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lvlROI4">
+      <Properties>
+        <Property name="font" type="java.awt.Font" resourceKey="lvlROI4.font"/>
+        <Property name="text" type="java.lang.String" resourceKey="lvlROI4.text"/>
+        <Property name="name" type="java.lang.String" value="lvlROI4" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtROI_X1">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtROI_X1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtROI_X2">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtROI_X2" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtROI_Y1">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtROI_Y1" noResource="true"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txtROI_Y2">
+      <Properties>
+        <Property name="horizontalAlignment" type="int" value="4"/>
+        <Property name="border" type="javax.swing.border.Border" editor="org.netbeans.modules.form.editors2.BorderEditor">
+          <Border info="org.netbeans.modules.form.compat2.border.LineBorderInfo">
+            <LineBorder/>
+          </Border>
+        </Property>
+        <Property name="name" type="java.lang.String" value="txtROI_Y2" noResource="true"/>
+      </Properties>
+    </Component>
+  </SubComponents>
+</Form>

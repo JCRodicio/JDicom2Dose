@@ -1,0 +1,1 @@
+java -jar "dist\JDicom2Dose.jar"

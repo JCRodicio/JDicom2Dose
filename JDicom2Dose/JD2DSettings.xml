@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>JD2DSettings.xml</comment>
+<entry key="sConfigBeam17"/>
+<entry key="sConfigBeam16"/>
+<entry key="sConfigBeam15"/>
+<entry key="bGenerateTIFFile">false</entry>
+<entry key="sConfigBeam14"/>
+<entry key="sConfigBeam13"/>
+<entry key="sConfigBeam12"/>
+<entry key="sConfigBeam11"/>
+<entry key="bRenamePCRTFiles">true</entry>
+<entry key="sConfigBeam10"/>
+<entry key="dX2ForROI">2.0</entry>
+<entry key="dX1ForROI">-2.0</entry>
+<entry key="dY2ForROI">2.0</entry>
+<entry key="dY1ForROI">-2.0</entry>
+<entry key="sWorkPath">Y:\Personal\JesusCortes\Colaboracion y proyectos\pocas UM con EPID\JD2D</entry>
+<entry key="iNumPixPCRT">400</entry>
+<entry key="bInterpolatePCRTFiles">true</entry>
+<entry key="sConfigBeam9"/>
+<entry key="sConfigBeam8"/>
+<entry key="sConfigBeam7"/>
+<entry key="sConfigBeam6"/>
+<entry key="sConfigBeam5">6MV_ONCOR#46397.0#0.05173#0.00604#0.0#0.19359#0.01323#0.0115#Y:\Personal\JesusCortes\Colaboracion y proyectos\pocas UM con EPID\JD2D\JDicom2Dose\config\6MV_ONCOR_FFF_conf.opg#</entry>
+<entry key="sConfigBeam4">Oncor_16MV#47639.0#0.0387#2.2001#0.0062#0.1571#1.7637#0.0119#C:\Oscar\Invest\JDICOM2DOSE\JDicom2Dose\config\Oncor_16MV_FFF_conf.opg#</entry>
+<entry key="bTrasl2Isocenter">false</entry>
+<entry key="sConfigBeam3"/>
+<entry key="sConfigBeam2"/>
+<entry key="sConfigBeam1"/>
+<entry key="sConfigBeam0"/>
+<entry key="bRenameFiles">true</entry>
+<entry key="bInterpolateFiles">false</entry>
+<entry key="iNumPixIntDefY">501</entry>
+<entry key="iNumPixIntDefX">501</entry>
+<entry key="sConfigPath">Y:\Personal\JesusCortes\Colaboracion y proyectos\pocas UM con EPID\JD2D\JDicom2Dose\config</entry>
+<entry key="sConfigBeam19"/>
+<entry key="sConfigBeam18"/>
+<entry key="bGenerateASCIIFile">true</entry>
+</properties>

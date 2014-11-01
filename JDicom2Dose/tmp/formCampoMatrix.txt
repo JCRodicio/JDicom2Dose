@@ -1,0 +1,593 @@
+Public Class formCampoMatrix
+    Dim dField(100, 100) As Double
+    Dim dCoorX(100) As Double
+    Dim dCoorY(100) As Double
+    Dim dFieldAux(100, 100) As Double
+    Dim dCoorXAux(100) As Double
+    Dim dCoorYAux(100) As Double
+    Dim iLenX As Integer = 0
+    Dim iLenY As Integer = 0
+    Dim iLenXAux As Integer = 0
+    Dim iLenYAux As Integer = 0
+    Dim dSDD As Double = -1
+    Dim dUniFactor As Double = 1
+
+    Dim sSep As String = ""
+    Dim i As Integer = 0
+    Dim j As Integer = 0
+    Dim sFormato3Dec As String = "{0,2:0.000}"
+    Dim sFormato2Dec As String = "{0,2:0.00}"
+    
+    Private Sub formCampoMatrix_FormClosed(ByVal sender As Object, ByVal e As System.Windows.Forms.FormClosedEventArgs) Handles Me.FormClosed
+        Array.Clear(dField, 0, dField.Length)
+        Array.Clear(dCoorX, 0, dCoorX.Length)
+        Array.Clear(dCoorY, 0, dCoorY.Length)
+        Array.Clear(dFieldAux, 0, dFieldAux.Length)
+        Array.Clear(dCoorXAux, 0, dCoorXAux.Length)
+        Array.Clear(dCoorYAux, 0, dCoorYAux.Length)
+    End Sub
+
+    Private Sub formCampoMatrix_Load(ByVal sender As Object, ByVal e As System.EventArgs) Handles Me.Load
+        Me.opMtx.Filter = "Ficheros OmniPro ImRT (*.opg;*.opi)|*.OPI;*.OPG;*.opi;*.opg|Todos los ficheros habidos y por haber (*.*)|*.*"
+        Me.savMtx.Filter = "Ficheros de texto (*.txt)|*.txt|Todos los ficheros habidos y por haber (*.*)|*.*"
+    End Sub
+
+    Private Sub butX1Y1Mtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butX1Y1Mtx.Click
+        Me.opMtx.FileName = "*X1Y1*"
+        If Me.opMtx.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Me.txtX1Y1Mtx.Text = Me.opMtx.FileName
+        Else
+            MsgBox("No se seleccionó ningún fichero válido.", MsgBoxStyle.Information, Me.lvlX1Y1Mtx.Text)
+            Me.txtX1Y1Mtx.Text = ""
+        End If
+    End Sub
+
+    Private Sub butX2Y1Mtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butX2Y1Mtx.Click
+        Me.opMtx.FileName = "*X2Y1*"
+        If Me.opMtx.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Me.txtX2Y1Mtx.Text = Me.opMtx.FileName
+        Else
+            MsgBox("No se seleccionó ningún fichero válido.", MsgBoxStyle.Information, Me.lvlX2Y1Mtx.Text)
+            Me.txtX2Y1Mtx.Text = ""
+        End If
+
+    End Sub
+
+    Private Sub butX1Y2Mtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butX1Y2Mtx.Click
+        Me.opMtx.FileName = "*X1Y2*"
+        If Me.opMtx.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Me.txtX1Y2Mtx.Text = Me.opMtx.FileName
+        Else
+            MsgBox("No se seleccionó ningún fichero válido.", MsgBoxStyle.Information, Me.lvlX1Y2Mtx.Text)
+            Me.txtX1Y2Mtx.Text = ""
+        End If
+
+    End Sub
+
+    Private Sub butX2Y2Mtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butX2Y2Mtx.Click
+        Me.opMtx.FileName = "*X2Y2*"
+        If Me.opMtx.ShowDialog = Windows.Forms.DialogResult.OK Then
+            Me.txtX2Y2Mtx.Text = Me.opMtx.FileName
+        Else
+            MsgBox("No se seleccionó ningún fichero válido.", MsgBoxStyle.Information, Me.lvlX2Y2Mtx.Text)
+            Me.txtX2Y2Mtx.Text = ""
+        End If
+
+    End Sub
+
+    Private Sub butCancelarMtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butCancelarMtx.Click
+        Me.Close()
+    End Sub
+
+    Private Sub butGenerarMtx_Click(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles butGenerarMtx.Click
+        Dim sResult As String = ""
+        Dim iResult As Integer = 0
+        Dim sResultFile As String = ""
+        Dim sLinea As String = ""
+        Dim sSep2 As String = vbTab
+        Dim dPaso As Double = 0
+        Dim scribidor As System.IO.StreamWriter
+        Array.Clear(dField, 0, dField.Length)
+        Array.Clear(dCoorX, 0, dCoorX.Length)
+        Array.Clear(dCoorY, 0, dCoorY.Length)
+
+        If Me.txtX1Y1Mtx.Text = "" Or Not My.Computer.FileSystem.FileExists(Me.txtX1Y1Mtx.Text) Then
+            MsgBox("No se seleccionó el fichero " & Me.lvlX1Y1Mtx.Text & " o no existe.", MsgBoxStyle.Information, Me.Text)
+            Exit Sub
+        End If
+        If Me.txtX2Y1Mtx.Text = "" Or Not My.Computer.FileSystem.FileExists(Me.txtX2Y1Mtx.Text) Then
+            MsgBox("No se seleccionó el fichero " & Me.lvlX2Y1Mtx.Text & " o no existe.", MsgBoxStyle.Information, Me.Text)
+            Exit Sub
+        End If
+        If Me.txtX2Y2Mtx.Text = "" Or Not My.Computer.FileSystem.FileExists(Me.txtX2Y2Mtx.Text) Then
+            MsgBox("No se seleccionó el fichero " & Me.lvlX2Y2Mtx.Text & " o no existe.", MsgBoxStyle.Information, Me.Text)
+            Exit Sub
+        End If
+        If Me.txtX1Y2Mtx.Text = "" Or Not My.Computer.FileSystem.FileExists(Me.txtX1Y2Mtx.Text) Then
+            MsgBox("No se seleccionó el fichero " & Me.lvlX1Y2Mtx.Text & " o no existe.", MsgBoxStyle.Information, Me.Text)
+            Exit Sub
+        End If
+
+        iResult = Me.iCargaOPGEnAux(Me.txtX1Y1Mtx.Text, sResult)
+        If iResult = 0 Then
+            iResult = Me.iPasaX1Y1()
+        End If
+        iResult = Me.iCargaOPGEnAux(Me.txtX2Y1Mtx.Text, sResult)
+        If iResult = 0 Then
+            iResult = Me.iPasaX2Y1()
+        End If
+        iResult = Me.iCargaOPGEnAux(Me.txtX1Y2Mtx.Text, sResult)
+        If iResult = 0 Then
+            iResult = Me.iPasaX1Y2()
+        End If
+        iResult = Me.iCargaOPGEnAux(Me.txtX2Y2Mtx.Text, sResult)
+        If iResult = 0 Then
+            iResult = Me.iPasaX2Y2()
+        End If
+
+        If Not iResult = 0 Then
+             If iResult = -2 Then
+                MsgBox("FICHERO OPG MALFORMADO: " & sResult, MsgBoxStyle.Critical, Me.Text)
+            Else
+                MsgBox(sResult, MsgBoxStyle.Critical, Me.Text)
+            End If
+        Else
+            Me.savMtx.FileName = Me.txtX1Y1Mtx.Text & ".opg"
+            Me.savMtx.Filter = "Ficheros OmniPro ImRT (*.opg;*.opi)|*.OPI;*.OPG;*.opi;*.opg|Todos los ficheros habidos y por haber (*.*)|*.*"
+            If Me.savMtx.ShowDialog = Windows.Forms.DialogResult.OK Then
+                sResultFile = Me.savMtx.FileName
+                scribidor = New System.IO.StreamWriter(sResultFile)
+                scribidor.WriteLine(formMainD2D.sEtFileIni)
+                scribidor.WriteLine("")
+                scribidor.WriteLine(formMainD2D.sEtHeaderIni)
+                scribidor.WriteLine(formMainD2D.sEtVer)
+                scribidor.WriteLine(formMainD2D.sEtSeparator & vbTab & """" & sSep & """")
+                scribidor.WriteLine(formMainD2D.sEtFileName & vbTab & sResultFile)
+                scribidor.WriteLine(formMainD2D.sEtXRay)
+                scribidor.WriteLine(formMainD2D.sEtSSD & vbTab & String.Format("{0,2:0.0}", dSDD).Replace(",", ".") & " cm")
+                scribidor.WriteLine(formMainD2D.sEtSID)
+                scribidor.WriteLine(formMainD2D.sEtSzCr & vbTab & String.Format("{0,2:0.0}", (Me.dCoorX(iLenX - 1) - Me.dCoorX(i))).Replace(",", ".") & " cm")
+                scribidor.WriteLine(formMainD2D.sEtSzIn & vbTab & String.Format("{0,2:0.0}", (Me.dCoorY(iLenY - 1) - Me.dCoorY(i))).Replace(",", ".") & " cm")
+                scribidor.WriteLine(formMainD2D.sEtType2 & vbTab & "Absolute")
+                scribidor.WriteLine(formMainD2D.sEtFactor & vbTab & "1")
+                scribidor.WriteLine(formMainD2D.sEtUnit & vbTab & "cGy")
+                scribidor.WriteLine(formMainD2D.sEtLUnit)
+                scribidor.WriteLine(formMainD2D.sEtPlane)
+                scribidor.WriteLine(formMainD2D.sEtNCols & vbTab & iLenX)
+                scribidor.WriteLine(formMainD2D.sEtNRows & vbTab & iLenY)
+                scribidor.WriteLine(formMainD2D.sEtNumOfBodies & vbTab & "1")
+                scribidor.WriteLine(formMainD2D.sEtNote & vbTab & "FICHERO ENSAMBLADO DE CUATRO CUADRANTES ADQUIRIDOS CON MATRIX (" & My.Application.Info.ProductName & " - v." & My.Application.Info.Version.ToString & ")")
+                scribidor.WriteLine(formMainD2D.sEtHeaderFin)
+                scribidor.WriteLine("")
+                scribidor.WriteLine(formMainD2D.sEtBodyIni)
+                scribidor.WriteLine(formMainD2D.sEtPlanePos)
+                scribidor.WriteLine("")
+
+                sLinea = "X[cm]" & sSep
+                For i = 0 To Me.iLenX - 1
+                    sLinea = sLinea & String.Format(sFormato3Dec, Me.dCoorX(i)) & sSep
+                Next
+                scribidor.WriteLine(sLinea.Replace(",", "."))
+                scribidor.WriteLine("Y[cm]")
+                For j = 0 To Me.iLenY - 1
+                    sLinea = String.Format(sFormato3Dec, Me.dCoorY(j)) & sSep
+                    For i = 0 To Me.iLenX - 1
+                        sLinea = sLinea & String.Format("{0,2:0.00}", Me.dField(i, j)) & sSep
+                    Next
+                    scribidor.WriteLine(sLinea.Replace(",", "."))
+                Next
+                scribidor.WriteLine(formMainD2D.sEtBodyFin)
+                scribidor.WriteLine(formMainD2D.sEtFileFin)
+                scribidor.Close()
+                MsgBox("Fichero OPG generado con exito: " & sResultFile, MsgBoxStyle.OkOnly, Me.Text)
+                Me.Close()
+                If Me.chkGenerarMtx.Checked Then
+                    ' Generamos el fichero.dat para Mathematica.
+                    For j = 0 To Me.iLenY - 1
+                        Me.dCoorY(j) = 100 * Me.dCoorY(j) / dSDD
+                        Me.dCoorX(j) = 100 * Me.dCoorX(j) / dSDD
+                    Next
+                    Dim dAux As Double = 0
+                    Dim dX As Double = 0
+                    Dim dY As Double = 0
+                    Dim iX1 As Integer = 0
+                    Dim iX2 As Integer = 0
+                    Dim iY1 As Integer = 0
+                    Dim iY2 As Integer = 0
+                    dPaso = (Me.dCoorX(Me.iLenX - 1) - Me.dCoorX(0)) / Me.iLenX
+                    sResultFile = Me.savMtx.FileName & ".dat"
+                    scribidor = New System.IO.StreamWriter(sResultFile)
+                    sSep2 = vbTab
+                    For j = 0 To 50
+                        sLinea = ""
+                        dY = (j - 25) / 2
+                        dAux = dY / dPaso
+                        dAux = dAux + (Me.iLenY / 2)
+                        iY1 = Math.Floor(dAux)
+                        If dCoorY(iY1) < dY Then
+                            While dCoorY(iY1) < dY
+                                iY1 = iY1 + 1
+                            End While
+                            iY2 = iY1
+                            iY1 = iY2 - 1
+                        ElseIf dCoorY(iY1) > dY Then
+                            While dCoorY(iY1) > dY
+                                iY1 = iY1 - 1
+                            End While
+                            iY2 = iY1 + 1
+                        Else
+                            iY2 = iY1 + 1
+                        End If
+
+                        For i = 0 To 50
+                            dX = (i - 25) / 2
+                            dAux = dX / dPaso
+                            dAux = dAux + (Me.iLenX / 2)
+                            iX2 = Math.Floor(dAux)
+                            If dCoorX(iX1) < dX Then
+                                While dCoorX(iX1) < dX
+                                    iX1 = iX1 + 1
+                                End While
+                                iX2 = iX1 - 1
+                            ElseIf dCoorX(iX1) > dX Then
+                                While dCoorX(iX1) > dX
+                                    iX1 = iX1 - 1
+                                End While
+                                iX2 = iX1
+                                iX2 = iX1 + 1
+                            Else
+                                iX2 = iX1 - 1
+                            End If
+
+                            dAux = formMainD2D.dInterpBilineal(dCoorX(iX1), dCoorX(iX2), dCoorY(iY1), dCoorY(iY2), dField(iX1, iY1), dField(iX1, iY2), dField(iX2, iY1), dField(iX2, iY2), dX, dY)
+                            sLinea = sLinea & Math.Round(dAux * 100)
+                            If Not i = Me.iLenX - 1 Then
+                                sLinea = sLinea & sSep2
+                            End If
+                        Next
+                        scribidor.WriteLine(sLinea.Replace(",", "."))
+                    Next
+                    scribidor.Close()
+                    MsgBox("Fichero DAT para Mathemática generado con exito: " & sResultFile, MsgBoxStyle.OkOnly, Me.Text)
+                    Me.Close()
+                End If
+            Else
+                MsgBox("No se seleccionó ningún fichero válido.", MsgBoxStyle.Exclamation, Me.Text)
+                Exit Sub
+            End If
+            End If
+
+    End Sub
+
+    Private Function iCargaOPGEnAux(ByVal sOpgFile As String, ByRef sResult As String) As Integer
+        Dim iResult As Integer = 0
+        Dim dDataFactor As Double = 1
+        Dim sLinea As String = ""
+        Dim sDataUnits As String = ""
+        Dim sNumOfBodies As String = ""
+        Dim dFac As Double = 0
+        Dim dSDDAux As Double = 0
+
+        Dim leedor As System.IO.StreamReader
+        Dim bInHead As Boolean = False
+        Dim bPostHead As Boolean = False
+        Dim bInBody As Boolean = False
+        Dim bPostBody As Boolean = False
+        Dim bInDM As Boolean = False
+        Dim sCampos() As String
+
+        Dim sAux As String = ""
+        Array.Clear(dFieldAux, 0, dFieldAux.Length)
+        Array.Clear(dCoorXAux, 0, dCoorXAux.Length)
+        Array.Clear(dCoorYAux, 0, dCoorYAux.Length)
+
+        If (My.Computer.FileSystem.FileExists(sOpgFile)) Then
+            leedor = My.Computer.FileSystem.OpenTextFileReader(sOpgFile, System.Text.Encoding.ASCII)
+            sLinea = leedor.ReadLine()
+            If Not sLinea.StartsWith(formMainD2D.sEtFileIni) Then
+                'El fichero no comienza con la etiqueta requerida
+                sLinea = Nothing
+                iResult = -2
+                sResult = "No encontrada la etiqueta de principio de fichero: " & formMainD2D.sEtFileIni
+            Else
+                j = 0
+                While Not sLinea.StartsWith(formMainD2D.sEtFileFin)
+                    If sLinea Is Nothing Then
+                        'Fichero incompleto o malformado.
+                        iResult = -2
+                        sResult = "Se ternimo el fichero si encontrar la etiqueta de final de fichero: " & formMainD2D.sEtFileFin
+                        Exit While
+                    End If
+                    sLinea = leedor.ReadLine()
+                    sLinea.TrimEnd(" ")
+                    If sLinea.StartsWith(formMainD2D.sEtHeaderIni) Then
+                        If bInDM = False And bInHead = False And bPostHead = False _
+                           And bInBody = False And bPostBody = False Then
+                            bInHead = True
+                        Else
+                            'Fichero incompleto o malformado.
+                            iResult = -2
+                            sResult = "Se encontro la siguiente etiqueta fuera de lugar: " & formMainD2D.sEtHeaderIni
+                            Exit While
+                        End If
+                    ElseIf sLinea.StartsWith(formMainD2D.sEtHeaderFin) Then
+                        If bInDM = False And bInHead = True And bPostHead = False _
+                           And bInBody = False And bPostBody = False Then
+                            bPostHead = True
+                            bInHead = False
+                        Else
+                            'Fichero incompleto o malformado.
+                            iResult = -2
+                            sResult = "Se encontro la siguiente etiqueta fuera de lugar: " & formMainD2D.sEtHeaderFin
+                            Exit While
+                        End If
+                    ElseIf sLinea.StartsWith(formMainD2D.sEtBodyIni) Then
+                        If bInDM = False And bInHead = False And bPostHead = True _
+                           And bInBody = False And bPostBody = False Then
+                            bInBody = True
+                        Else
+                            'Fichero incompleto o malformado.
+                            iResult = -2
+                            sResult = "Se encontro la siguiente etiqueta fuera de lugar: " & formMainD2D.sEtBodyIni
+                            Exit While
+                        End If
+                    ElseIf sLinea.StartsWith(formMainD2D.sEtBodyFin) Then
+                        If bInDM = False And bInHead = False And bPostHead = True _
+                           And bInBody = True And bPostBody = False Then
+                            bPostBody = True
+                        Else
+                            'Fichero incompleto o malformado.
+                            iResult = -2
+                            sResult = "Se encontro la siguiente etiqueta fuera de lugar: " & formMainD2D.sEtBodyFin
+                            Exit While
+                        End If
+                    Else
+                        If bInHead Then
+                            If sLinea.StartsWith(formMainD2D.sEtSeparator) Then
+                                sSep = sLinea.Substring(sLinea.Length - 2, 1)
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtFactor) Then
+                                sAux = formMainD2D.sEtFactor
+                                dDataFactor = Double.Parse(sLinea.Substring(sAux.Length + 1).Replace(".", ","))
+                                'iDataFactor = Integer.Parse(sLinea.Substring(formMainD2D.sEtFactor.Length + 1).Replace(".", ","))
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtUnit) Then
+                                If sLinea.EndsWith("mGy") Then
+                                    Me.dUniFactor = 0.1
+                                ElseIf sLinea.EndsWith(" Gy") Then
+                                    Me.dUniFactor = 100
+                                End If
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtSSD) Then
+                                sAux = formMainD2D.sEtSSD
+                                sAux = sLinea.Substring(sAux.Length + 1).Replace(".", ",")
+                                If sAux.EndsWith(" cm") Then
+                                    dFac = 1
+                                ElseIf sAux.EndsWith(" mm") Then
+                                    dFac = 0.1
+                                Else
+                                    dFac = 0
+                                End If
+                                dSDDAux = Double.Parse(sAux.Substring(0, sAux.Length - 3)) * dFac
+                                'iDataFactor = Integer.Parse(sLinea.Substring(formMainD2D.sEtFactor.Length + 1).Replace(".", ","))
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtUnit) Then
+                                sDataUnits = sLinea.Substring(formMainD2D.sEtUnit.Length + 1).Trim()
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtNCols) Then
+                                Me.iLenXAux = Integer.Parse(sLinea.Substring(formMainD2D.sEtNCols.Length + 1))
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtNRows) Then
+                                Me.iLenYAux = Integer.Parse(sLinea.Substring(formMainD2D.sEtNRows.Length + 1))
+                            ElseIf sLinea.StartsWith(formMainD2D.sEtNumOfBodies) Then
+                                sNumOfBodies = sLinea.Substring(sLinea.Length - 1, 1)
+                                If Not sNumOfBodies = "1" Then
+                                    iResult = -2
+                                    sResult = "Fichero con más de un body. solo se permite una imagen por archivo."
+                                    Exit While
+                                End If
+                            End If
+                        End If
+                        If bPostHead = True And bInBody = False And bPostBody = False Then
+                            If dSDDAux = 0 Then
+                                iResult = -2
+                                sResult = "No se encontro la siguiente etiqueta: " & formMainD2D.sEtSSD
+                                Exit While
+                            ElseIf (Not dSDDAux = dSDD) And (Not dSDD = -1) Then
+                                iResult = -2
+                                sResult = "Los ficheros tienes distinta SDD! Se suspende el proceso."
+                                Exit While
+                            Else
+                                dSDD = dSDDAux
+                            End If
+                            If sSep = "" Then
+                                iResult = -2
+                                sResult = "No se encontro la siguiente etiqueta: " & formMainD2D.sEtSeparator
+                                Exit While
+                            End If
+                            If Me.iLenXAux = 0 Or Me.iLenYAux = 0 Then
+                                iResult = -2
+                                sResult = "No se encontraron las etiquetas de tamaño de la matriz de datos: " & formMainD2D.sEtNCols & " o " & formMainD2D.sEtNRows
+                                Exit While
+                            End If
+                        End If
+                        If bInBody Then
+                            If sLinea.StartsWith(formMainD2D.sEtPlanePos) Or (sLinea.StartsWith(formMainD2D.sEtY)) Or (sLinea = "") Then
+                                ' No hacemos nada en este caso??
+                            ElseIf (sLinea.StartsWith(formMainD2D.sEtX)) Then
+                                sCampos = sLinea.Split(sSep)
+                                For i = 0 To Me.iLenXAux - 1
+                                    Me.dCoorXAux(i) = (Double.Parse(sCampos(i + 1).Replace(".", ",")))
+                                Next
+                            Else
+                                If j < Me.iLenYAux Then
+                                    sCampos = sLinea.Split(sSep)
+                                    For i = 0 To Me.iLenXAux
+                                        If i = 0 Then
+                                            Me.dCoorYAux(j) = (Double.Parse(sCampos(i).Replace(".", ",")))
+                                        Else
+                                            Me.dFieldAux(i - 1, j) = (Double.Parse(sCampos(i).Replace(".", ","))) * dDataFactor * dUniFactor
+                                        End If
+                                    Next
+                                    j = j + 1
+                                End If
+                            End If
+                        End If
+                        End If
+                End While
+                leedor.Close()
+                If iResult = 0 Then
+                    'MsgBox("El proceso ha terminado con éxito.", MsgBoxStyle.OkOnly, "Cargando DICOM")
+                End If
+            End If
+        Else
+            iResult = -1
+            sResult = "Hubo un problema y el fichero en fomato OPG no se encontro."
+        End If
+        Return iResult
+    End Function
+
+    Private Function iPasaX1Y1() As Integer
+        Dim iResult As Integer = 0
+        For i = 0 To Me.iLenXAux - 1
+            Me.dCoorX(i) = Me.dCoorXAux(i) - 10.0
+        Next
+        For j = 0 To Me.iLenYAux - 1
+            Me.dCoorY(j) = Me.dCoorYAux(j) - 10.0
+        Next
+        For i = 0 To Me.iLenXAux - 1
+            For j = 0 To Me.iLenYAux - 1
+                Me.dField(i, j) = Me.dFieldAux(i, j)
+            Next
+        Next
+        iLenX = iLenXAux
+        iLenY = iLenYAux
+        Return iResult
+    End Function
+
+    Private Function iPasaX2Y1() As Integer
+        Dim iResult As Integer = 0
+        Dim iIniXAux As Integer = 0
+        Dim iIniX As Integer = 0
+        For i = 0 To Me.iLenXAux - 1
+            If Me.dCoorXAux(i) > -10 Then
+                iIniXAux = i
+                Exit For
+            End If
+        Next
+        For i = 0 To Me.iLenX - 1
+            If Me.dCoorX(i) > 0 Then
+                iIniX = i
+                Exit For
+            End If
+        Next
+        For i = 0 To Me.iLenXAux - 1 - iIniXAux
+            Me.dCoorX(iIniX + i) = Me.dCoorXAux(i + iIniXAux) + 10.0
+            For j = 0 To Me.iLenYAux - 1
+                Me.dField(iIniX + i, j) = Me.dFieldAux(i + iIniXAux, j)
+            Next
+        Next
+        iLenX = iLenXAux + iIniX - iIniXAux
+
+        Return iResult
+    End Function
+
+    Private Function iPasaX1Y2() As Integer
+        Dim iResult As Integer = 0
+        Dim iFinXAux As Integer = 0
+        Dim iIniX As Integer = 0
+        Dim iIniYAux As Integer = 0
+        Dim iIniXAux As Integer = 0
+        Dim iIniY As Integer = 0
+        For i = 0 To Me.iLenXAux - 1
+            Me.dCoorXAux(i) = Me.dCoorXAux(i) + 10
+        Next
+        For j = 0 To Me.iLenYAux - 1
+            Me.dCoorYAux(j) = (-1 * Me.dCoorYAux(j)) + 10
+        Next
+
+        For i = Me.iLenXAux - 1 To 0 Step -1
+            If Me.dCoorXAux(i) > 0 Then
+                iInixAux = i
+                Exit For
+            End If
+        Next
+        For j = Me.iLenYAux - 1 To 0 Step -1
+            If Me.dCoorYAux(j) > 0 Then
+                iIniYAux = j
+                Exit For
+            End If
+        Next
+
+        For j = 0 To Me.iLenY - 1
+            If Me.dCoorY(j) > 0 Then
+                iIniY = j
+                Exit For
+            End If
+        Next
+        For i = 0 To Me.iLenX - 1
+            If Me.dCoorX(i) > 0 Then
+                iIniX = i
+                Exit For
+            End If
+        Next
+
+        For j = iIniY To iIniY + iIniYAux
+            Me.dCoorY(j) = Me.dCoorYAux(iIniYAux - j + iIniY)
+        Next
+        For i = 0 To Me.iLenXAux - 1
+            For j = iIniY To iIniY + iIniYAux
+                Me.dField(i, j) = Me.dFieldAux(Me.iLenXAux - 1 - i, iIniYAux - j + iIniY)
+            Next
+        Next
+        iLenY = iIniY + iIniYAux + 1
+
+        Return iResult
+    End Function
+
+    Private Function iPasaX2Y2() As Integer
+        Dim iResult As Integer = 0
+        Dim iFinXAux As Integer = 0
+        Dim iIniX As Integer = 0
+        Dim iIniYAux As Integer = 0
+        Dim iIniXAux As Integer = 0
+        Dim iIniY As Integer = 0
+        For i = 0 To Me.iLenXAux - 1
+            Me.dCoorXAux(i) = (-1 * Me.dCoorXAux(i)) + 10
+        Next
+        For j = 0 To Me.iLenYAux - 1
+            Me.dCoorYAux(j) = (-1 * Me.dCoorYAux(j)) + 10
+        Next
+
+        For i = Me.iLenXAux - 1 To 0 Step -1
+            If Me.dCoorXAux(i) > 0 Then
+                iInixAux = i
+                Exit For
+            End If
+        Next
+
+        For j = Me.iLenYAux - 1 To 0 Step -1
+            If Me.dCoorYAux(j) > 0 Then
+                iIniYAux = j
+                Exit For
+            End If
+        Next
+
+        For i = 0 To Me.iLenX - 1
+            If Me.dCoorX(i) > 0 Then
+                iIniX = i
+                Exit For
+            End If
+        Next
+
+        For j = 0 To Me.iLenY - 1
+            If Me.dCoorY(j) > 0 Then
+                iIniY = j
+                Exit For
+            End If
+        Next
+
+        For i = iIniX To iIniX + iIniXAux
+            For j = iIniY To iIniY + iIniYAux
+                Me.dField(i, j) = Me.dFieldAux(iIniXAux - i + iIniX, iIniYAux - j + iIniY)
+            Next
+        Next
+        
+        Return iResult
+    End Function
+    
+End Class

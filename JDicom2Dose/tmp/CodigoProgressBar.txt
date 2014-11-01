@@ -1,0 +1,45 @@
+private String sProcessName="";
+    private int iMaxLimit=100;
+    private int iMinLimit=0;
+    private int iStep=1;
+    private int iCurrent=0;
+
+    /** Creates new form JD2DProg */
+    public JD2DProgFrit(Frame parent) {
+        super(parent);
+        initComponents();
+    }
+
+    /** Creates new form JD2DProg */
+    public JD2DProgFrit(Frame parent,String sProcess, int iMin, int iMax) {
+        initComponents();
+        this.sProcessName=sProcess;
+        this.iMaxLimit=iMax;
+        this.iMinLimit=iMin;
+        this.iCurrent=iMin;
+        this.jProgressBar1.setMaximum(this.iMaxLimit);
+        this.jProgressBar1.setMinimum(this.iMinLimit);
+        this.refreshPB();
+    }
+
+    public void resetProg(String sProcess, int iMin, int iMax){
+        this.sProcessName=sProcess;
+        this.iMaxLimit=iMax;
+        this.iMinLimit=iMin;
+        this.iCurrent=iMin;
+        this.jProgressBar1.setMaximum(this.iMaxLimit);
+        this.jProgressBar1.setMinimum(this.iMinLimit);
+        this.refreshPB();
+    }
+
+    public void unPasitoParaElFrente(){
+        this.iCurrent=this.iCurrent+this.iStep;
+        this.refreshPB();
+    }
+
+    private void refreshPB(){
+        double iD =this.iCurrent;
+        int iPercent=(int)(JD2DCtes.dRound2(100*iD/(this.iMaxLimit-this.iMinLimit),0)*100);
+        this.jProgressBar1.setValue(this.iCurrent);
+        this.jProgressBar1.setString(this.sProcessName + "... "+iPercent+"%");
+    }

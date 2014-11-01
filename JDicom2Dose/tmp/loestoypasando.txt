@@ -1,0 +1,911 @@
+
+/**
+ * Write a description of class dicomManager here.
+ * 
+ * @author (your name) 
+ * @version (a version number or a date)
+ */
+
+/*
+ * UM --> 3002,0032
+ * RT IMAGE SID: 1450 --> 3002,0026
+ * NUMBER OF SUBFRAMES?? --> 0039,1577  ---: 5 
+ * 0028,0008  Number of Frames: 7 
+ * 3002,0032  ---: 56
+ * 3002,0032  ---: 117 
+ * ...
+ * 3002,0026  RT IMAGE SID: 1450
+ * 0039,1577  ---: 80\165\101\268\71\75
+ * 0039,1179  ---: FIELD NAME
+ */
+
+import ij.plugin.*;
+import ij.io.*;
+import java.io.*;
+import java.util.*;
+import java.net.URL;
+import ij.*;
+import ij.process.*;
+import ij.util.Tools;
+import ij.measure.Calibration;
+
+public class dicomManager
+{
+    // instance variables
+    private int i;
+    private int j;
+    private int imax;
+    private int jmax;
+    private int dimensiones[] = new int[5];
+    private int pixel[] = new int[4];
+    private String path = "";
+    private static final double PIXEL_RESOLUTION_EPID = 0.4; // en milimetros 
+    private static final int NUM_PIXELS_EPID = 1024;
+    private static final double SUBFRAMES_SEGUNDO = 3.5;
+    
+    /**
+     * Constructor for objects of class dicomManager
+     */
+    public dicomManager()
+    {
+        // initialise instance variables
+    }
+
+    /**
+     * Executable method leeTagsDicom
+     * Lee las etiquetas que nos interesan del fichero DICOM especificado en el parámetro path.
+     * Tambien devuelve el objeto FIle
+     */
+    //public int leeTagsDicom (String path){
+    public double[] leeTagsDicom (String directory, String fileName, StringBuffer sbFN){
+        int iMU_NUMBER = 0x30020032;
+        int iRT_IMAGE_SID = 0x30020026; 
+        int iNUMBER_OF_SUBFRAMES = 0x00391577;
+        double[] dResp = new double[3];
+        for (int ii=0;ii<2;ii++) dResp[ii]=0.0;
+        
+        //File fich= new File(path);
+        DicomDecoderBis dd = new DicomDecoderBis(directory, fileName);
+        FileInfo fi = null;
+        try {fi = dd.getFileInfo();}
+        catch (IOException e) {
+            String msg = e.getMessage();
+            System.out.println("Error : '" + msg );
+            if (msg.indexOf("EOF")<0) {
+                dResp[0]=-1;
+                return dResp;
+            } 
+            else if (!dd.dicmFound()) {
+                msg = "This does not appear to be a valid\n"
+                + "DICOM file. It does not have the\n"
+                + "characters 'DICM' at offset 128.";
+                System.out.println("Error : '" + msg );
+                 dResp[0]=-2;
+                return dResp;
+           }
+            else {
+                dResp[0]=-3;
+                return dResp;
+            }
+        }
+        
+        sbFN.append(dd.sFieldName);
+        dResp[0]=dd.dUM;
+        dResp[1]=dd.dSID;
+        
+        if (dd.dSubframes > 0) {
+            dResp[2]=dd.dSubframes;
+        }
+        else {
+            dResp[2]=0;
+            StringTokenizer st = new StringTokenizer(dd.sSubframes,"\\");
+            Double d;
+            while (st.hasMoreTokens()) {
+                try {d = new Double(st.nextToken());}
+                catch (NumberFormatException e) {d = null;}
+                if (d!=null) {
+                    dResp[2]=dResp[2]+d.doubleValue();
+                }
+           }
+        }
+        return dResp;
+    }    
+    
+    
+    /**
+     * Executable method renombraDicoms
+     * Cambia el nombre de los fichero DICOM y les pone el nombre del HAZ.
+     */
+    public int renombraDicoms (String path){
+        int k=0;
+        int i=0;
+        String sNewPath = "";
+        String sNewNameExt = "";
+        
+        File newFile;
+        File oldFile;
+        String sFiltro[] = {".IMA",".ima",".DCM",".dcm"};
+        File dir= new File(path);
+        FilenameFilter filtroIMA = new FileListFilter(sFiltro);
+        
+        int huevo=(dir.listFiles(filtroIMA)).length;
+        try {
+            sNewPath=path+"\\"+"cambioNombresFicheros.log";
+            BufferedWriter condemor = new BufferedWriter(new FileWriter(sNewPath));
+            File flInDir[]=flInDir=dir.listFiles(filtroIMA);
+            for (k=0; k < flInDir.length; k++) {
+                StringBuffer sbNewName = new StringBuffer("");
+                leeTagsDicom(flInDir[k].getParent()+"//", flInDir[k].getName(),sbNewName);
+                sNewNameExt=sbNewName.toString().trim()+".IMA";
+                newFile= new File(flInDir[k].getParent()+"//"+sNewNameExt);
+                System.out.println("Tratado el fichero: '" + sbNewName.toString() + "'");
+                oldFile= new File(flInDir[k].getPath());
+                System.out.println("------------------> '" + oldFile.getPath() + "'");
+                if (!(newFile.getPath().equals(oldFile.getPath()))) {
+                
+                    for (i=1;i<100;i++){
+                        newFile= new File(flInDir[k].getParent()+"//"+sNewNameExt);
+                        if (newFile.exists()) {
+                            sNewNameExt=sbNewName.toString()+"_"+i+".IMA";
+                        }
+                        else {
+                            i=102;
+                        }
+                    }
+                    System.out.println("------------------> '" + newFile.getPath() + "'");
+                    if (oldFile.renameTo(newFile)) {
+                        condemor.write(flInDir[k].getName()+" ---> "+sNewNameExt);
+                        condemor.newLine();
+                    }
+                    else {
+                        condemor.write("No Puedor... No Puedor...");
+                        condemor.newLine();
+                    }
+                }
+                else{
+                    System.out.println("------------------> No es necesario renombralo");
+                }
+               
+            } //end for por ficheros.
+            condemor.close();
+        } //end try
+        catch (IOException e) {
+            System.out.println("Ocurrio una excepción al cambiar el nombre a los ficheros del directorio: '" + path + "'");
+            System.out.println("Detalles: '" + e.toString() + "'");
+            return -1;
+        } 
+        return 0;
+    }
+
+    
+    /**
+     * Executable method dosisCentralDicoms
+     * Analiza la linealidad de la resuesta en grises afectada por el número de frames frente a las UM.
+     * Promedia los valores de los pixels en el cuadro centras de 5mm x 5mm.
+     */
+    public int dosisCentralDicoms (String path){
+        int k=0;
+        int imin=(int) Math.round(Math.floor((NUM_PIXELS_EPID/2) - (5.0/PIXEL_RESOLUTION_EPID)));
+        int jmin=imin;
+        int iCuantos=0;
+        double dGris=0.0;
+        double dMedia=0.0;
+        double dDesEs=0.0;
+        imax = (int) Math.round(Math.ceil((NUM_PIXELS_EPID/2) + (5.0/PIXEL_RESOLUTION_EPID)));
+        jmax = imax;
+        String sNewPath = "";
+        File dir= new File(path);
+        StringBuffer sbAux = new StringBuffer("");
+        String sFiltro[] = {".IMA",".ima",".DCM",".dcm"};
+        FilenameFilter filtroIMA = new FileListFilter(sFiltro);
+        DICOM dcm = null;
+
+        int huevo=(dir.listFiles(filtroIMA)).length;
+        try {
+            sNewPath=path+"\\"+"dosisCentral.txt";
+            BufferedWriter condemor = new BufferedWriter(new FileWriter(sNewPath));
+            condemor.write("FILE;UM;SUBFRAMES;TONO_GRIS;DESES_GRIS");
+            condemor.newLine();
+                    
+            for (k=0; k < (dir.listFiles(filtroIMA)).length; k++) {
+                dcm = new DICOM();
+                dcm.open((dir.listFiles(filtroIMA)[k]).getPath());
+                System.out.println("Tratado el fichero: '" + dcm.getTitle() + "'");
+                if (dcm.getWidth()==0) {
+                    System.out.println("Error abriendo: '" + (dir.listFiles(filtroIMA)[k]).getPath() + "'");
+                    return -1;
+                }
+                else {
+                    dimensiones=dcm.getDimensions();
+                    if (dimensiones[3] > 1) {
+                        System.out.println("EL fichero tiene más de una Slice, tio!");
+                        return -1;
+                    }
+                    else {
+                        dcm.show("PROCESANDO LA IMAGEN "+(dir.listFiles(filtroIMA)[k]).getPath()+", POR FAVOR, ESPERE...");
+                        iCuantos=0;
+                        dGris=0.0;
+                        for (i=imin;i<imax;i++) {
+                            for (j=jmin;j<jmax;j++) {
+                                pixel=dcm.getPixel(i,j);
+                                iCuantos++;
+                                dGris=dGris+pixel[0];
+                            }
+                        }
+                        dMedia=dGris/iCuantos;
+                        if (iCuantos<1) {
+                            dDesEs=0.0;
+                        }
+                        else {
+                            for (i=imin;i<imax;i++) {
+                                for (j=jmin;j<jmax;j++) {
+                                    pixel=dcm.getPixel(i,j);
+                                    dDesEs=dDesEs+((pixel[0]-dMedia)*(pixel[0]-dMedia));
+                                }
+                            }
+                            dDesEs=Math.sqrt(dDesEs)/(iCuantos-1);
+                        }
+                        double dTags[]=null;
+                        //System.out.println("dir.listFiles(filtroIMA)[k]).getPath(): " + dir.listFiles(filtroIMA)[k].getPath());
+                        //System.out.println("dir.listFiles(filtroIMA)[k]).getParent(): " + dir.listFiles(filtroIMA)[k].getParent());
+                        //System.out.println("dir.listFiles(filtroIMA)[k]).getName(): " + dir.listFiles(filtroIMA)[k].getName());
+                        dTags=leeTagsDicom(dir.listFiles(filtroIMA)[k].getParent()+"//", dir.listFiles(filtroIMA)[k].getName(),sbAux);
+                        if (dTags[0]<0) {
+                            System.out.println("Problema al leer las etiquetas del DICOM, tio!");
+                            return -1;
+                        }
+                        dMedia=dTags[2]*dMedia;
+                        dDesEs=dTags[2]*dDesEs;
+                        condemor.write(dcm.getTitle()+";"+dTags[0]+";"+dTags[2]+";"+Math.round(dMedia)+";"+Math.round(dDesEs));
+                        condemor.newLine();
+                    } // end else (dimensiones[3] > 1)
+                } // end else (dcm.getWidth()==0)
+                dcm.close();
+            } //end for por ficheros.
+            condemor.close();
+        } //end try
+        catch (IOException e) {
+            System.out.println("Ocurrio una excepción al procesar los ficheros del directorio: '" + path + "'");
+            System.out.println("Detalles: '" + e.toString() + "'");
+            return -1;
+        } 
+        return 0;
+    }
+    
+    
+    /**
+     * Executable method dicom2txt
+     * Pasa a formato txt un fichero dicomRT adquirido con el EPID de un Siemens Oncor.
+     */
+    public int dicom2txt (String path){
+        // initialise instance variables
+        DICOM dcm = new DICOM();
+        i = 0;
+        j = 0;
+        StringBuffer sbAux=new StringBuffer("");
+        for (i=0;i<5;i++) dimensiones[i]=0;
+        dcm.open(path);
+        if (dcm.getWidth()==0) {
+            System.out.println("Error abriendo: '" + path + "'");
+            return -1;
+        }
+        else
+            System.out.println("Hemos abierto el fichero: '" + path + "'");
+        dimensiones=dcm.getDimensions();
+        System.out.println("width: "+dimensiones[0]);
+        System.out.println("height: "+dimensiones[1]);
+        System.out.println("nChannels: "+dimensiones[2]);
+        System.out.println("nSlices: "+dimensiones[3]);
+        System.out.println("nFrames: "+dimensiones[4]);
+        File fl=new File(path);    
+        System.out.println("fl.getName(): "+fl.getName());
+        System.out.println("fl.getPath: "+fl.getPath());
+        System.out.println("fl.getAbsolutePath(): "+fl.getAbsolutePath());
+        System.out.println("fl.getParent(): "+fl.getParent());
+        double dTags[]=null;
+        dTags=leeTagsDicom(fl.getParent()+"\\",fl.getName(),sbAux);
+        System.out.println("Campo: "+sbAux.toString());
+        if (dTags[0]<0) {
+            System.out.println("Problema al leer las etiquetas del DICOM, tio!");
+            return -1;
+        }
+        System.out.println("UM: "+dTags[0]);
+        System.out.println("SID: "+dTags[1]);
+        System.out.println("SUBFRAMES: "+dTags[2]);
+        if (dimensiones[3] > 1) 
+            System.out.println("EL fichero tiene más de una Slice, tio!");
+        else {
+            try {
+                //dcm.draw();
+                dcm.show("PROCESANDO LA IMAGEN, POR FAVOR, ESPERE...");
+                imax = dcm.getHeight();
+                jmax = dcm.getHeight();
+                BufferedWriter condemor = new BufferedWriter(new FileWriter(path+".d2t"));
+                for (i=imax-1;i>=0;i--) {
+                    for (j=0;j<jmax;j++) {
+                        if (j!=0) 
+                            condemor.write(" ");
+                        pixel=dcm.getPixel(j,i);
+                        /*if ((j==512) && (i==512)) 
+                            System.out.println("Pixel("+i+","+j+")="+pixel[0]);*/
+                        condemor.write(""+pixel[0]*dTags[2]+"");
+                    }
+                    condemor.newLine();
+                }
+                condemor.close();
+                /*jmax=dcm.getType();*/
+                System.out.println("Tratado el fichero: '" + dcm.getTitle() + "'");
+            } 
+            catch (IOException e) 
+            {
+                System.out.println("Ocurrio una excepción al procesar el fichero: '" + path + "'");
+                System.out.println("Detalles: '" + e.toString() + "'");
+            } 
+        }
+        dcm.close();
+        return 0;
+    }
+
+     /**
+     * Executable method dicom2OPIMRTASCII
+     * Pasa al formato de OmniPro I'MRT ASCII un fichero dicomRT adquirido con el EPID de un Siemens Oncor.
+     */
+    public int dicom2OPIMRTASCII (String path){
+        // initialise instance variables
+        DICOM dcm = new DICOM();
+        int iSubframes =0;
+        int iSlices =0;
+        double dTime = 0.0;
+        String sLine = "";
+        StringBuffer sbFieldName=new StringBuffer("");
+        i = 0;
+        j = 0;
+        String sSeparator = ";";
+        for (i=0;i<5;i++) dimensiones[i]=0;
+        dcm.open(path);
+        if (dcm.getWidth()==0) {
+            System.out.println("Error abriendo: '" + path + "'");
+            return -1;
+        }
+        else
+            System.out.println("Hemos abierto el fichero: '" + path + "'");
+        dimensiones=dcm.getDimensions();
+        iSlices=dimensiones[3];
+        System.out.println("width: "+dimensiones[0]);
+        System.out.println("height: "+dimensiones[1]);
+        System.out.println("nChannels: "+dimensiones[2]);
+        System.out.println("nSlices: "+dimensiones[3]);
+        System.out.println("nFrames: "+dimensiones[4]);
+        File fl=new File(path);    
+        System.out.println("fl.getName(): "+fl.getName());
+        System.out.println("fl.getPath: "+fl.getPath());
+        System.out.println("fl.getAbsolutePath(): "+fl.getAbsolutePath());
+        System.out.println("fl.getParent(): "+fl.getParent());
+        double dTags[]=null;
+        dTags=leeTagsDicom(fl.getParent()+"\\",fl.getName(),sbFieldName);
+        if (dTags[0]<0) {
+            System.out.println("Problema al leer las etiquetas del DICOM, tio!");
+            return -1;
+        }
+        System.out.println("UM: "+dTags[0]);
+        System.out.println("SID: "+dTags[1]);
+        System.out.println("SUBFRAMES: "+dTags[2]);
+        iSubframes = (int) dTags[2];
+        if (dimensiones[3] > 1) {
+            System.out.println("EL fichero tiene más de una Slice, tio!"); 
+        }
+        
+        try {
+            //dcm.draw();
+            dcm.show("PROCESANDO LA IMAGEN, POR FAVOR, ESPERE...");
+            imax = dcm.getHeight();
+            jmax = dcm.getHeight();
+            BufferedWriter condemor = new BufferedWriter(new FileWriter(path+".opg"));
+            condemor.write("<opimrtascii>");condemor.newLine();condemor.newLine();
+            condemor.write("<asciiheader>");condemor.newLine();
+            condemor.write("File Version: \t 3");condemor.newLine();
+            condemor.write("Separator: \t \""+sSeparator+"\"");condemor.newLine();
+            condemor.write("File Name: \t "+fl.getAbsolutePath());condemor.newLine();
+            condemor.write("Image Name: \t "+sbFieldName.toString());condemor.newLine();
+            condemor.write("Radiation Type: \t X RAY");condemor.newLine();
+            condemor.write("SSD: \t "+dTags[1]+" mm");condemor.newLine();
+            condemor.write("SID: \t 1000.0 mm");condemor.newLine();
+            condemor.write("Field Size Cr: \t "+NUM_PIXELS_EPID*PIXEL_RESOLUTION_EPID+" mm");condemor.newLine();
+            condemor.write("Field Size In: \t "+NUM_PIXELS_EPID*PIXEL_RESOLUTION_EPID+" mm");condemor.newLine();
+            condemor.write("Data Type: \t Rel. Dose");condemor.newLine();
+            condemor.write("Data Factor: \t 1");condemor.newLine();
+            condemor.write("Data Unit: \t Gy");condemor.newLine();
+            condemor.write("Length Unit: \t mm");condemor.newLine();
+            condemor.write("Plane: \t XY");condemor.newLine();
+            condemor.write("No. of Columns: \t "+dimensiones[1]);condemor.newLine();
+            condemor.write("No. of Rows: \t "+dimensiones[0]);condemor.newLine();
+            condemor.write("Number of Bodies: \t 1");condemor.newLine();
+            condemor.write("Operators Note: \t SOLO CONTIENE DOSIS SIN TRANSFORMAR -+");condemor.newLine();
+            condemor.write("</asciiheader>");condemor.newLine();condemor.newLine();
+            
+            condemor.write("<dicomManager>");condemor.newLine();
+            dTime=iSubframes/SUBFRAMES_SEGUNDO;
+            dTime=(Math.round(100*dTime))/100.0;
+            condemor.write("AqTime: \t "+dTime);condemor.newLine();
+            condemor.write("UM: \t "+((int)dTags[0]));condemor.newLine();
+            condemor.write("Subframes: \t "+iSubframes);condemor.newLine();
+            condemor.write("</dicomManager>");condemor.newLine();
+            
+            condemor.write("<asciibody>");condemor.newLine();
+            condemor.write("Plane Position: \t 0.0 mm");condemor.newLine();condemor.newLine();
+            sLine="X[mm]\t";
+            double dAux=0.0;
+            for (i=0;i<imax;i++) {
+               sLine=sLine+sSeparator;
+               dAux=PIXEL_RESOLUTION_EPID*(i-(imax/2));
+               dAux=(Math.round(100*dAux))/100.0;
+               sLine=sLine+dAux;
+               /*condemor.write(""+PIXEL_RESOLUTION_EPID*(i-(imax/2)));*/
+            }
+            condemor.write(sLine);condemor.newLine();
+            sLine="";
+            condemor.write("Y[mm]");condemor.newLine();
+            for (i=imax-1;i>=0;i--) {
+                dAux=PIXEL_RESOLUTION_EPID*((imax/2)-i);
+                dAux=(Math.round(100*dAux))/100.0;
+                sLine=sLine+(dAux);
+                /*condemor.write(""+PIXEL_RESOLUTION_EPID*(i-(imax/2)));*/
+                for (j=0;j<jmax;j++) {
+                    /*condemor.write(sSeparator);*/
+                    /* if ((i > imax - 10) & (j < 10)) {
+                        sLine=sLine+sSeparator+9999999;
+                    }
+                    else {
+                        pixel=dcm.getPixel(j,i);
+                        sLine=sLine+sSeparator+(pixel[0]*iSubframes);
+                    }*/
+                    pixel=dcm.getPixel(j,i);
+                    sLine=sLine+sSeparator+(pixel[0]*iSubframes);
+                }
+                condemor.write(sLine);condemor.newLine();
+                sLine="";
+                if (i%50==0) {
+                    System.out.print(".");
+                }
+            }
+            condemor.write("</asciibody>");condemor.newLine();condemor.newLine();
+            condemor.write("</opimrtascii>");condemor.newLine();
+            condemor.close();
+            /*jmax=dcm.getType();*/
+            System.out.println("Tratado el fichero: '" + dcm.getTitle() + "'");
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("Ocurrio una excepción al procesar el fichero: '" + path + "'");
+            System.out.println("Detalles: '" + e.toString() + "'");
+        } 
+    
+        dcm.close();
+        return 0;
+    }
+
+    
+    /**
+     * Executable method leeTagsPCRT
+     * Lee las etiquetas que necesitamos para transformar el fichero DICOM de PCRT especificado en el parámetro path.
+     */
+    //public int leeTagsPCRT (String path){
+    public int leeTagsPCRT (String directory, String fileName,double[] dAux, StringBuffer sbDoseUnits){
+        /*int i_PIXELSPACING = 0x00280030;*/
+        int iResp = 0;
+        
+        //File fich= new File(path);
+        DicomDecoderBis dd = new DicomDecoderBis(directory, fileName);
+        FileInfo fi = null;
+        try {
+            fi = dd.getFileInfo();
+            System.out.println("fi.pixelWidth : " + fi.pixelWidth );
+            System.out.println("fi.pixelHeight : " + fi.pixelHeight );
+            dAux[0]=fi.pixelWidth;
+            dAux[1]=fi.pixelHeight;
+            sbDoseUnits.append(dd.sDoseType);
+            dAux[2]=dd.dDoseFactor;
+        }
+        catch (IOException e) {
+            String msg = e.getMessage();
+            System.out.println("Error : '" + msg );
+            if (msg.indexOf("EOF")<0) {
+                iResp=-1;        
+            } 
+            else if (!dd.dicmFound()) {
+                msg = "This does not appear to be a valid\n"
+                + "DICOM file. It does not have the\n"
+                + "characters 'DICM' at offset 128.";
+                System.out.println("Error : '" + msg );
+                iResp=-1;
+           }
+           dAux[0]=-1;
+           dAux[1]=-1;
+           dAux[2]=-1;
+        }      
+        return iResp;
+    }
+    
+     /**
+     * Executable method dicomPCRT2OPIMRTASCII
+     * Pasa al formato de OmniPro I'MRT ASCII un fichero dicomRT de PCRT.
+     */
+    public int dicomPCRT2OPIMRTASCII (String path){
+        // initialise instance variables
+        DICOM dcm = new DICOM();
+        int iSlices =0;
+        int iWidth =0;
+        int iHeight =0;
+        double dTime = 0.0;
+        StringBuffer sbUnits = new StringBuffer("");
+        String sLine = "";
+        i = 0;
+        j = 0;
+        String sSeparator = ";";
+        String sAux = "";
+        for (i=0;i<5;i++) dimensiones[i]=0;
+        dcm.open(path);
+        if (dcm.getWidth()==0) {
+            System.out.println("Error abriendo: '" + path + "'");
+            return -1;
+        }
+        else
+            System.out.println("Hemos abierto el fichero: '" + path + "'");
+        dimensiones=dcm.getDimensions();
+        iSlices=dimensiones[3];
+        iWidth=dimensiones[0];
+        iHeight=dimensiones[1];
+        System.out.println("width: "+iWidth);
+        System.out.println("height: "+iHeight);
+        System.out.println("nChannels: "+dimensiones[2]);
+        System.out.println("nSlices: "+dimensiones[3]);
+        System.out.println("nFrames: "+dimensiones[4]);
+        File fl=new File(path);    
+        double dTags[]={0,0,0};
+        leeTagsPCRT(fl.getParent()+"\\",fl.getName(),dTags,sbUnits);
+        /*if (dTags[0]<0) {
+            System.out.println("Problema al leer las etiquetas del DICOM, tio!");
+            return -1;
+        }
+        System.out.println("UM: "+dTags[0]);
+        System.out.println("SID: "+dTags[1]);
+        System.out.println("SUBFRAMES: "+dTags[2]);
+        iSubframes = (int) dTags[2];
+        */
+        if (dimensiones[3] > 1) {
+            System.out.println("EL fichero tiene más de una Slice, tio!"); 
+        }
+        
+        try {
+            //dcm.draw();
+            dcm.show("PROCESANDO LA IMAGEN, POR FAVOR, ESPERE...");
+            imax = dcm.getHeight();
+            jmax = dcm.getWidth();
+            BufferedWriter condemor = new BufferedWriter(new FileWriter(path+".opg"));
+            condemor.write("<opimrtascii>");condemor.newLine();condemor.newLine();
+            condemor.write("<asciiheader>");condemor.newLine();
+            condemor.write("File Version: \t 3");condemor.newLine();
+            condemor.write("Separator: \t \""+sSeparator+"\"");condemor.newLine();
+            condemor.write("File Name: \t "+fl.getAbsolutePath());condemor.newLine();
+            if (fl.getName().length()>20) 
+                sAux=fl.getName().substring(0, 18)+"...";
+            else
+                sAux=fl.getName();
+            condemor.write("Image Name: \t "+sAux);condemor.newLine();
+            condemor.write("Radiation Type: \t X RAY");condemor.newLine();
+            condemor.write("SSD: \t 1000.0 mm");condemor.newLine();
+            condemor.write("SID: \t 1000.0 mm");condemor.newLine();
+            condemor.write("Field Size Cr: \t "+jmax*dTags[0]+" mm");condemor.newLine();
+            condemor.write("Field Size In: \t "+imax*dTags[1]+" mm");condemor.newLine();
+            condemor.write("Data Type: \t Abs. Dose");condemor.newLine();
+            condemor.write("Data Factor: \t "+dTags[2]+"");condemor.newLine();
+            condemor.write("Data Unit: \t "+sbUnits.toString()+"");condemor.newLine();
+            condemor.write("Length Unit: \t mm");condemor.newLine();
+            condemor.write("Plane: \t XY");condemor.newLine();
+            condemor.write("No. of Columns: \t "+jmax);condemor.newLine();
+            condemor.write("No. of Rows: \t "+imax);condemor.newLine();
+            condemor.write("Number of Bodies: \t 1");condemor.newLine();
+            condemor.write("Operators Note: \t PLANO DE DOSIS DE PCRT");condemor.newLine();
+            condemor.write("</asciiheader>");condemor.newLine();condemor.newLine();
+            
+            condemor.write("<asciibody>");condemor.newLine();
+            condemor.write("Plane Position: \t 0.0 mm");condemor.newLine();condemor.newLine();
+            sLine="X[mm]\t";
+            double dAux=0.0;
+            for (j=0;j<jmax;j++) {
+               sLine=sLine+sSeparator;
+               dAux=dTags[0]*(j-(jmax/2));
+               dAux=(Math.round(100*dAux))/100.0;
+               sLine=sLine+dAux;
+            }
+            condemor.write(sLine);condemor.newLine();
+            sLine="";
+            condemor.write("Y[mm]");condemor.newLine();
+            for (i=imax-1;i>=0;i--) {
+                dAux=dTags[1]*((imax/2)-i);
+                dAux=(Math.round(100*dAux))/100.0;
+                sLine=sLine+(dAux);
+                for (j=0;j<jmax;j++) {
+                    pixel=dcm.getPixel(j,i);
+                    sLine=sLine+sSeparator+(pixel[0]);
+                }
+                condemor.write(sLine);condemor.newLine();
+                sLine="";
+                if (j%50==0) {
+                    System.out.print(".");
+                }
+            }
+            condemor.write("</asciibody>");condemor.newLine();condemor.newLine();
+            condemor.write("</opimrtascii>");condemor.newLine();
+            condemor.close();
+            System.out.println("Tratado el fichero: '" + dcm.getTitle() + "'");
+        } 
+        catch (IOException e) 
+        {
+            System.out.println("Ocurrio una excepción al procesar el fichero: '" + path + "'");
+            System.out.println("Detalles: '" + e.toString() + "'");
+        } 
+    
+        dcm.close();
+        return 0;
+    }
+
+    
+    /**
+     * Executable method sumaDicom2OPIMRTASCII
+     * Pasa al formato de OmniPro I'MRT ASCII la suma de los ficheros dicomRT que adquirido con el 
+     * EPID de un Siemens Oncor que se encuentren en el directorio que se proporciona como argumento.
+     */
+    public int sumaDicom2OPIMRTASCII (String path){
+        int k=0;
+        int iCuantos=0;
+        int iSSD=0;
+        int iCol=0;
+        int iRow=0;
+        int iSubframes =0;
+        double dTime=.0;
+        int iAcumSubframes,iAcumUM;
+        String sLine = "";
+        int iPix[][] = new int[1024][1024];
+        for (i=0;i<1024;i++) {
+            for (j=0;j<1024;j++){
+                iPix[i][j]=0;
+            }
+        }
+        String sListaFicheros = "";
+        StringBuffer sbAux = new StringBuffer("");
+        String sAux222222 = "";
+        String sSeparator = ";";
+        String sNewPath = "";
+        File dir= new File(path);
+        String sFiltro[] = {".IMA",".ima",".DCM",".dcm"};
+        FilenameFilter filtroIMA = new FileListFilter(sFiltro);
+        DICOM dcm = null;
+
+        iAcumSubframes=0;
+        iAcumUM=0;
+        int huevo=(dir.listFiles(filtroIMA)).length;
+        try {
+            for (k=0; k < (dir.listFiles(filtroIMA)).length; k++) {
+                dcm = new DICOM();
+                dcm.open((dir.listFiles(filtroIMA)[k]).getPath());
+                System.out.println("Tratando el fichero: '" + dcm.getTitle() + "'");
+                if (dcm.getWidth()==0) {
+                    System.out.println("Error abriendo: '" + (dir.listFiles(filtroIMA)[k]).getPath() + "'");
+                    return -1;
+                }
+                else {
+                    dimensiones=dcm.getDimensions();
+                    if (dimensiones[3] > 1) {
+                        System.out.println("EL fichero tiene más de una Slice, tio!");
+                        return -1;
+                    }
+                    else {
+                        dcm.show("PROCESANDO LA IMAGEN "+(dir.listFiles(filtroIMA)[k]).getPath()+", POR FAVOR, ESPERE...");
+                        double dTags[]=null;
+                        dTags=leeTagsDicom(dir.listFiles(filtroIMA)[k].getParent()+"//", dir.listFiles(filtroIMA)[k].getName(),sbAux);
+                        sListaFicheros = sListaFicheros +  dir.listFiles(filtroIMA)[k].getName() + " | ";
+                        if (dTags[0]<0) {
+                            System.out.println("Problema al leer las etiquetas del DICOM, tio!");
+                            return -1;
+                        }
+                        if (k==0) {
+                            iSSD=(int) dTags[1];
+                            iCol=(int) dimensiones[1];
+                            iRow=(int) dimensiones[0];
+                        }
+                        else {
+                            if ((iSSD != ((int) dTags[1])) || (iCol != ((int) dimensiones[1])) || (iRow != ((int) dimensiones[0]))){
+                                System.out.println("Hay ficheros DICOM con distitas características, deben coincidir las dimensiones y el SSD, PECADOR!");
+                                return -1;
+                            }
+                        }
+                        
+                        iAcumSubframes = iAcumSubframes + ((int) dTags[2]);
+                        iAcumUM = iAcumUM + ((int) dTags[0]);
+                        iSubframes = (int) dTags[2];
+                        for (i=0;i>1024;i++) {
+                            for (j=0;j<1024;j++){
+                                pixel=dcm.getPixel(j,i);
+                                iPix[i][j]=iPix[i][j] + pixel[0]*iSubframes;
+                            }
+                        }
+                    } // end else (dimensiones[3] > 1)
+                } // end else (dcm.getWidth()==0)
+                dcm.close();
+            } //end for por ficheros.
+            sNewPath=path+"\\"+"sumaDicoms.opg";
+            BufferedWriter condemor = new BufferedWriter(new FileWriter(sNewPath));             
+            condemor.write("<opimrtascii>");condemor.newLine();condemor.newLine();
+            condemor.write("<asciiheader>");condemor.newLine();
+            condemor.write("File Version: \t 3");condemor.newLine();
+            condemor.write("Separator: \t \""+sSeparator+"\"");condemor.newLine();
+            condemor.write("File Name: \t "+sNewPath);condemor.newLine();
+            if (sListaFicheros.length()>20) 
+                sAux222222=sListaFicheros.substring(0, 18)+"...";
+            else
+                sAux222222=sListaFicheros;
+            condemor.write("Image Name: \t "+sAux222222);condemor.newLine();
+            condemor.write("Radiation Type: \t X RAY");condemor.newLine();
+            condemor.write("SSD: \t "+iSSD+" mm");condemor.newLine();
+            condemor.write("SID: \t 1000.0 mm");condemor.newLine();
+            condemor.write("Field Size Cr: \t "+NUM_PIXELS_EPID*PIXEL_RESOLUTION_EPID+" mm");condemor.newLine();
+            condemor.write("Field Size In: \t "+NUM_PIXELS_EPID*PIXEL_RESOLUTION_EPID+" mm");condemor.newLine();
+            condemor.write("Data Type: \t Rel. Dose");condemor.newLine();
+            condemor.write("Data Factor: \t 1");condemor.newLine();
+            condemor.write("Data Unit: \t Gy");condemor.newLine();
+            condemor.write("Length Unit: \t mm");condemor.newLine();
+            condemor.write("Plane: \t XY");condemor.newLine();
+            condemor.write("No. of Columns: \t "+iCol);condemor.newLine();
+            condemor.write("No. of Rows: \t "+iRow);condemor.newLine();
+            condemor.write("Number of Bodies: \t 1");condemor.newLine();
+            condemor.write("Operators Note: \t SUMA DE FICHEROS. SOLO CONTIENE DOSIS SIN TRANSFORMAR");condemor.newLine();
+            condemor.write("</asciiheader>");condemor.newLine();condemor.newLine();
+            
+            condemor.write("<dicomManager>");condemor.newLine();
+            dTime=iAcumSubframes/SUBFRAMES_SEGUNDO;
+            dTime=(Math.round(100*dTime))/100.0;
+            condemor.write("AqTime(s): \t "+dTime);condemor.newLine();
+            condemor.write("UM: \t "+iAcumUM);condemor.newLine();
+            condemor.write("Subframes: \t "+iAcumSubframes);condemor.newLine();
+            condemor.write("Ficheros Sumados: \t "+sListaFicheros);condemor.newLine();
+            condemor.write("</dicomManager>");condemor.newLine();
+                
+            condemor.write("<asciibody>");condemor.newLine();
+            condemor.write("Plane Position: \t 0.0 mm");condemor.newLine();condemor.newLine();
+            sLine="X[mm]\t";
+            double dAux=0.0;
+            imax=jmax=1024;
+            for (i=0;i<imax;i++) {
+               sLine=sLine+sSeparator;
+               dAux=PIXEL_RESOLUTION_EPID*(i-(imax/2));
+               dAux=(Math.round(100*dAux))/100.0;
+               sLine=sLine+dAux;
+            }
+            condemor.write(sLine);condemor.newLine();
+            sLine="";
+            condemor.write("Y[mm]");condemor.newLine();
+            for (i=imax-1;i>=0;i--) {
+                dAux=PIXEL_RESOLUTION_EPID*((imax/2)-i);
+                dAux=(Math.round(100*dAux))/100.0;
+                sLine=sLine+(dAux);
+                for (j=0;j<jmax;j++) {
+                    sLine=sLine+sSeparator+(iPix[i][j]);
+                }
+                condemor.write(sLine);condemor.newLine();
+                sLine="";
+                if (i%50==0) {
+                    System.out.print(".");
+                }
+            }
+            condemor.write("</asciibody>");condemor.newLine();condemor.newLine();
+            condemor.write("</opimrtascii>");condemor.newLine();
+            condemor.close();
+        } //end try
+        catch (IOException e) {
+            System.out.println("Ocurrio una excepción al procesar los ficheros del directorio: '" + path + "'");
+            System.out.println("Detalles: '" + e.toString() + "'");
+            return -1;
+        } 
+        return 0;
+    }
+
+/**
+     * Executable method multiDicom2OPIMRTASCII
+     * Pasa al formato de OmniPro I'MRT ASCII multiples ficheros dicomRT que adquiridos con el 
+     * EPID de un Siemens Oncor que se encuentren en el directorio que se proporciona como argumento.
+     */
+    public int multiDicom2OPIMRTASCII (String path){
+        int k=0;
+        int iRes=0;
+        long lMilisIni=System.currentTimeMillis();
+        long lCuantoTarda=0;
+        File dir= new File(path);
+        String sFiltro[] = {".IMA",".ima",".DCM",".dcm"};
+        FilenameFilter filtroIMA = new FileListFilter(sFiltro);
+
+        for (k=0; k < (dir.listFiles(filtroIMA)).length; k++) {
+                iRes=dicomPCRT2OPIMRTASCII((dir.listFiles(filtroIMA)[k]).getPath());
+                if (iRes==0) 
+                    System.out.println("Tratado el fichero : '" + (dir.listFiles(filtroIMA)[k]).getName() + "'");
+                else 
+                    System.out.println("Fallo en el fichero: '" + (dir.listFiles(filtroIMA)[k]).getName() + "'");
+        } //end for por ficheros.
+        lCuantoTarda=Math.round((System.currentTimeMillis()-lMilisIni)/1000);
+        System.out.println("Preprocesados '" + k + " ficheros en "+lCuantoTarda+" segundos.");
+        System.out.println("Como se te ha quedado el cuerpo.");
+        return iRes;
+    }
+
+}
+
+class FileListFilter implements FilenameFilter {
+  private String[] extension=null; 
+
+  public FileListFilter(String[] exten) {
+    this.extension = exten;
+  }
+
+  public boolean accept(File directory, String filename) {
+    boolean fileOK = false;
+
+    if (extension != null) {
+        for(int ii=0;ii<this.extension.length;ii++) {
+            if (filename.endsWith(this.extension[ii])) fileOK=true;
+        }
+    }
+    return fileOK;
+  }
+}
+
+/*
+ * UM --> 3002,0032
+ * RT IMAGE SID: 1450 --> 3002,0026
+ * NUMBER OF SUBFRAMES?? --> 0039,1577  ---: 5 
+ */
+
+
+
+04 http://www.megaupload.com/?d=DFDNZ5JV
+05 http://www.megaupload.com/?d=JB5LU4QI
+06 http://www.megaupload.com/?d=188OWOBT
+07 http://www.megaupload.com/?d=31MU93TB
+08 http://www.megaupload.com/?d=S0RO1Q6B
+09 http://www.megaupload.com/?d=G6875B49
+10 http://www.megaupload.com/?d=UUOUJ5FA
+11 http://www.megaupload.com/?d=AB5KYZQ1
+12 http://www.megaupload.com/?d=TIMRL4AV
+13 http://www.megaupload.com/?d=JNMLW8AP
+14 http://www.megaupload.com/?d=376403K8
+15 http://www.megaupload.com/?d=3QXVKLJR
+16 http://www.megaupload.com/?d=5P21KIL0
+17 http://www.megaupload.com/?d=24DGMBDZ
+18 http://www.megaupload.com/?d=55F1GZVA
+19 http://www.megaupload.com/?d=EGT5E0ET
+20 http://www.megaupload.com/?d=DTZV002Q
+21 http://www.megaupload.com/?d=410REG99
+22 http://www.megaupload.com/?d=GMTY45BN
+23 http://www.megaupload.com/?d=OBTERBQG
+24 http://www.megaupload.com/?d=E781MGML
+25 http://www.megaupload.com/?d=9UTBLO27
+26 http://www.megaupload.com/?d=N5UCGK4Z
+27 http://www.megaupload.com/?d=WPKKN48I
+28 http://www.megaupload.com/?d=EV77JWEI
+29 http://www.megaupload.com/?d=4VOIJF9I
+30 http://www.megaupload.com/?d=SZACUUVF
+31 http://www.megaupload.com/?d=DVQMOOO9
+32 http://www.megaupload.com/?d=MUB9JLKO
+33 http://www.megaupload.com/?d=9PF6CATL
+34 http://www.megaupload.com/?d=I3U61F4Q
+35 http://www.megaupload.com/?d=PETRZSVQ
+36 http://www.megaupload.com/?d=5Y4S66CV
+37 http://www.megaupload.com/?d=V980C8B9
+38 http://www.megaupload.com/?d=1RYTSE7R
+39 http://www.megaupload.com/?d=42SG9TET
+40 http://www.megaupload.com/?d=XQCRLN8M
+41 http://www.megaupload.com/?d=KUBLTCDH
+42 http://www.megaupload.com/?d=2RJGZJ35
+43 http://www.megaupload.com/?d=VSAWZH1Z
+44 http://www.megaupload.com/?d=MAKXG0IC
+45 http://www.megaupload.com/?d=FQ39M8FT
+46 http://www.megaupload.com/?d=OZWG1A1V
